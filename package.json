@@ -1,0 +1,17 @@
+{
+  "name": "solc-compile-monorepo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": "true",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "workspaces": [
+    "packages/**/*"
+  ],
+  "dependencies": {
+    "fs-extra": "^10.1.0",
+    "semver": "^7.3.8"
+  }
+}
