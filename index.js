@@ -20,25 +20,29 @@ for (const vulnerability of vulnerabilities) {
     for (const contract of contracts) {
         const filepath = path.resolve(contractsPath, contract);
 
-        const source = fs.readFileSync(filepath, "utf8");
-        const { avaiable, version } = detectVersion(source, versions);
+        try {
+            const source = fs.readFileSync(filepath, "utf8");
+            const { avaiable, version } = detectVersion(source, versions);
 
-        // check version
-        if (avaiable) {
-            const compiler = getCompiler(version);
-            if (compiler) {
-                const output = compiler(contract, source);
-                const outputFilepath = path.resolve(
-                    outputPath,
-                    vulnerability,
-                    contract + ".bin"
-                );
-                fs.outputFileSync(outputFilepath, output);
+            // check version
+            if (avaiable) {
+                const compiler = getCompiler(version);
+                if (compiler) {
+                    //     const output = compiler(contract, source);
+                    //     const outputFilepath = path.resolve(
+                    //         outputPath,
+                    //         vulnerability,
+                    //         contract + ".bin"
+                    //     );
+                    //     fs.outputFileSync(outputFilepath, output);
+                } else {
+                    // console.log(`Missing compiler version ${version}`);
+                }
             } else {
-                console.log(`Missing compiler version ${version}`);
+                console.log(`Missing version from ${contract}: ${version}`);
             }
-        } else {
-            console.log(`Missing version from ${contract}: ${version}`);
+        } catch (err) {
+            console.log(err.message);
         }
     }
 }
