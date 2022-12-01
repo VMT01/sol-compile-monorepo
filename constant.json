@@ -1,5 +1,0 @@
-{
-    "inputDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/datasets/test-source-code",
-    "outputDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/code/solc-compile-monorepo/build",
-    "versions": ["0.4.24", "0.5.16", "0.6.12", "0.7.5"]
-}
