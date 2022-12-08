@@ -8,4 +8,46 @@ export { v0_4_23 } from "./v0.4.23";
 export { v0_4_24 } from "./v0.4.24";
 export { v0_4_25 } from "./v0.4.25";
 export { v0_4_26 } from "./v0.4.26";
+
+export { v0_5_0 } from "./v0.5.0";
+export { v0_5_2 } from "./v0.5.2";
+export { v0_5_3 } from "./v0.5.3";
+export { v0_5_6 } from "./v0.5.6";
+export { v0_5_7 } from "./v0.5.7";
+export { v0_5_8 } from "./v0.5.8";
+export { v0_5_9 } from "./v0.5.9";
+export { v0_5_10 } from "./v0.5.10";
+export { v0_5_11 } from "./v0.5.11";
+export { v0_5_12 } from "./v0.5.12";
+export { v0_5_13 } from "./v0.5.13";
+export { v0_5_14 } from "./v0.5.14";
+export { v0_5_15 } from "./v0.5.15";
 export { v0_5_16 } from "./v0.5.16";
+export { v0_5_17 } from "./v0.5.17";
+
+export { v0_6_0 } from "./v0.6.0";
+export { v0_6_1 } from "./v0.6.1";
+export { v0_6_2 } from "./v0.6.2";
+export { v0_6_4 } from "./v0.6.4";
+export { v0_6_6 } from "./v0.6.6";
+export { v0_6_7 } from "./v0.6.7";
+export { v0_6_8 } from "./v0.6.8";
+export { v0_6_9 } from "./v0.6.9";
+export { v0_6_10 } from "./v0.6.10";
+export { v0_6_11 } from "./v0.6.11";
+export { v0_6_12 } from "./v0.6.12";
+
+export { v0_7_0 } from "./v0.7.0";
+export { v0_7_3 } from "./v0.7.3";
+export { v0_7_4 } from "./v0.7.4";
+export { v0_7_5 } from "./v0.7.5";
+export { v0_7_6 } from "./v0.7.6";
+
+export { v0_8_0 } from "./v0.8.0";
+export { v0_8_1 } from "./v0.8.1";
+export { v0_8_2 } from "./v0.8.2";
+export { v0_8_3 } from "./v0.8.3";
+export { v0_8_4 } from "./v0.8.4";
+export { v0_8_5 } from "./v0.8.5";
+export { v0_8_6 } from "./v0.8.6";
+export { v0_8_7 } from "./v0.8.7";
