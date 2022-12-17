@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import * as semver from "semver";
 
-import { outputDir, errorDir, versions } from "./constant.json";
+import { outputDir, errorDir, convertDir, versions } from "./constant.json";
 import { IDetectVersion } from "./Interfaces/detectVersion.interface";
 import { IInput, INewInput, IOldInput } from "./Interfaces/input.interface";
 
@@ -86,6 +86,12 @@ export const createErrorPath = (
     filename: string,
     extension: string = "txt"
 ) => resolve(errorDir, ...level, filename + "." + extension);
+
+export const createConvertPath = (
+    level: string[],
+    filename: string,
+    extension: string = "txt"
+) => resolve(convertDir, ...level, filename + "." + extension);
 
 export const createInput = (
     filename: string,

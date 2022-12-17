@@ -34,6 +34,8 @@ function main(dir: string): void {
     for (const vulnerability of vulnerabilities) {
         if (vulnerability === "Other") continue;
 
+        console.log(`Start compile in ${vulnerability}`);
+
         const vulnerabilityPath: string = resolve(dir, vulnerability);
         readdirSync(vulnerabilityPath).forEach((item) => {
             const filename = item.replace(/\.[^/.]+$/, "");
@@ -63,32 +65,6 @@ function main(dir: string): void {
             }
         });
     }
-    // readdirSync(dir).forEach((item) => {
-    //     const itemPath = resolve(dir, item);
-    //     if (lstatSync(itemPath).isDirectory()) {
-    //         console.log(`Start compile in: ${itemPath}`);
-    //         main(itemPath, [...level, item]);
-    //     } else {
-    //         const filename = item.replace(/\.[^/.]+$/, "");
-    //         const source: string = readFileSync(itemPath, "utf8");
-
-    //         try {
-    //             const { avaiable, version } = detectVersion(source);
-    //             if (!avaiable) throw new Error();
-
-    //             const outPath: string = createOutputPath(level, filename);
-    //             const input: IInput = createInput(filename, source, version);
-    //             const output: string | null = compile(filename, version, input);
-
-    //             if (output !== null) outputFileSync(outPath, output);
-    //         } catch (err: any) {
-    //             console.log(err.message);
-
-    //             const errPath: string = createErrorPath(level, filename);
-    //             outputFileSync(errPath, source);
-    //         }
-    //     }
-    // });
 }
 
 setup();
