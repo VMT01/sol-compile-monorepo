@@ -2,6 +2,7 @@
     "inputDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/datasets/Source code",
     "outputDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/code/solc-compile-monorepo/build",
     "errorDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/code/solc-compile-monorepo/error",
+    "convertDir": "/home/thanhvm/Learning/HUST/2022-1/IT3943/code/solc-compile-monorepo/convert",
     "versions": [
         "0.4.11",
         "0.4.14",

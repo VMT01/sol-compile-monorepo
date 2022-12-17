@@ -6,7 +6,8 @@
   "private": "true",
   "scripts": {
     "detect-missing-version": "ts-node src/detectMissingVersion.ts",
-    "compile": "ts-node src/compile.ts"
+    "compile": "ts-node src/compile.ts",
+    "convert": "ts-node src/convert.ts"
   },
   "workspaces": {
     "packages": ["packages/**/*"]
