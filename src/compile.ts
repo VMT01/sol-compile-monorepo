@@ -40,28 +40,39 @@ function main(dir: string): void {
         readdirSync(vulnerabilityPath).forEach((item) => {
             const filename = item.replace(/\.[^/.]+$/, "");
             const filepath = resolve(vulnerabilityPath, item);
-            const source: string = readFileSync(filepath, "utf8");
 
-            try {
-                const { avaiable, version } = detectVersion(source);
-                if (!avaiable) throw new Error();
+            if (!lstatSync(filepath).isDirectory()) {
+                const source: string = readFileSync(filepath, "utf8");
 
-                const outPath: string = createOutputPath(
-                    [vulnerability],
-                    filename
-                );
-                const input: IInput = createInput(filename, source, version);
-                const output: string | null = compile(filename, version, input);
+                try {
+                    const { avaiable, version } = detectVersion(source);
+                    if (!avaiable) throw new Error();
 
-                if (output !== null) outputFileSync(outPath, output);
-            } catch (err: any) {
-                console.log(err.message);
+                    const outPath: string = createOutputPath(
+                        [vulnerability],
+                        filename
+                    );
+                    const input: IInput = createInput(
+                        filename,
+                        source,
+                        version
+                    );
+                    const output: string | null = compile(
+                        filename,
+                        version,
+                        input
+                    );
 
-                const errPath: string = createErrorPath(
-                    [vulnerability],
-                    filename
-                );
-                outputFileSync(errPath, source);
+                    if (output !== null) outputFileSync(outPath, output);
+                } catch (err: any) {
+                    console.log(err.message);
+
+                    const errPath: string = createErrorPath(
+                        [vulnerability],
+                        filename
+                    );
+                    outputFileSync(errPath, source);
+                }
             }
         });
     }
