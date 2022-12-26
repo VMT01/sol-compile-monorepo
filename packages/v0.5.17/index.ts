@@ -1,14 +1,13 @@
-import { compile } from "solc";
+import { IInput } from "src/types/input";
+import { INewOutput } from "src/types/output";
 
-import { IInput } from "../../src/Interfaces/input.interface";
+import { bytecode, error } from "../../src/utils";
 
-export const v0_5_17 = (filename: string, input: IInput) => {
-    const output = JSON.parse(compile(JSON.stringify(input)));
-    const contracts = output.contracts[filename];
-    const bytecode = Object.keys(contracts).reduce(
-        (pre, key) => pre + contracts[key].evm.bytecode.object,
-        ""
-    );
+const solc = require("solc");
 
-    return bytecode;
+export function v0_5_17(filename: string, input: IInput): string {
+    global.compileOutput = JSON.parse(solc.compile(JSON.stringify(input))) as INewOutput;
+    if (global.compileOutput.errors) throw new Error(error());
+
+    return bytecode(true, filename);
 };

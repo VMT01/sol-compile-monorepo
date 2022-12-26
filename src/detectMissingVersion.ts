@@ -1,29 +1,47 @@
 import { resolve } from "path";
-import { lstatSync, readdirSync, readFileSync } from "fs-extra";
+import { readdirSync, readFileSync } from "fs-extra";
+import { Presets, SingleBar } from "cli-progress";
 
-import { inputDir } from "./constant.json";
+import { IVersion } from "./types/version";
+
+import folderTree from "../folder-tree.json";
+import { inputDir } from "../constant.json";
+
 import { detectVersion } from "./utils";
 
-const inputPath: string = resolve(inputDir);
 const missingVersions: Set<string> = new Set();
+const bar: SingleBar = new SingleBar({}, Presets.shades_classic);
 
-function main(dir: string): void {
-    readdirSync(dir).forEach((item) => {
-        const itemPath = resolve(dir, item);
-        if (lstatSync(itemPath).isDirectory()) {
-            console.log(`Start detect in: ${itemPath}`);
-            main(itemPath);
-        } else {
+let vulnerability: string;
+let contracts: string[],
+    contract: string,
+    contractPath: string,
+    contractSource: string,
+    contractVersion: IVersion;
+let index: number;
+
+function main() {
+    for (vulnerability of folderTree) {
+        console.log(`Start detect in: ${vulnerability}`);
+
+        contracts = readdirSync(resolve(inputDir, vulnerability));
+        bar.start(contracts.length, 0);
+
+        for (index = 0; index < contracts.length; index++) {
+            bar.update(index + 1);
             try {
-                const source: string = readFileSync(itemPath, "utf8");
-                const { avaiable, version } = detectVersion(source);
-                if (!avaiable) missingVersions.add(version);
-            } catch (err: any) {
-                console.log(`Error: ${itemPath}`, err.message);
-            }
+                contract = contracts[index];
+                contractPath = resolve(inputDir, vulnerability, contract);
+                contractSource = readFileSync(contractPath, "utf8");
+                contractVersion = detectVersion(contractSource, contract);
+
+                if (!contractVersion.available) missingVersions.add(contractVersion.version);
+            } catch (err) {}
         }
-    });
+
+        bar.stop();
+    }
 }
 
-main(inputPath);
+main();
 console.log("Missing version:", missingVersions);

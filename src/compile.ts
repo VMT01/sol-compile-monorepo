@@ -1,82 +1,81 @@
 import { resolve } from "path";
 import {
     ensureDirSync,
-    lstatSync,
     outputFileSync,
     readdirSync,
     readFileSync,
     removeSync,
 } from "fs-extra";
+import { Presets, SingleBar } from "cli-progress";
 
-import { inputDir, outputDir, errorDir } from "./constant.json";
-import {
-    compile,
-    createErrorPath,
-    createInput,
-    createOutputPath,
-    detectVersion,
-} from "./utils";
-import { IInput } from "./Interfaces/input.interface";
+import { IVersion } from "./types/version";
+import { IInput } from "./types/input";
+import { IError } from "./types/output";
 
-const inputPath: string = resolve(inputDir);
-const outputPath: string = resolve(outputDir);
-const errorPath: string = resolve(errorDir);
+import folderTree from "../folder-tree.json";
+import { inputDir, outputDir, errorDir } from "../constant.json";
+
+import { compile, createInput, detectVersion } from "./utils";
+
+const bar: SingleBar = new SingleBar({}, Presets.shades_classic);
+
+let vulnerability: string;
+let contracts: string[],
+    contract: string,
+    contractName: string,
+    contractPath: string,
+    contractSource: string,
+    contractVersion: IVersion;
+let index: number;
+let input: IInput;
+let outputPath: string, errorPath: string;
 
 function setup(): void {
-    removeSync(outputPath);
-    ensureDirSync(outputPath);
-    removeSync(errorPath);
-    ensureDirSync(errorPath);
+    // remove old folder
+    removeSync(outputDir);
+    ensureDirSync(outputDir);
+    removeSync(errorDir);
+    ensureDirSync(errorDir);
+
+    // set global value
+    global.compileOutput = undefined;
+    global.contractBytecode = undefined;
 }
 
-function main(dir: string): void {
-    const vulnerabilities: string[] = readdirSync(dir);
-    for (const vulnerability of vulnerabilities) {
-        if (vulnerability === "Other") continue;
-
+function main(): void {
+    for (vulnerability of folderTree) {
         console.log(`Start compile in ${vulnerability}`);
 
-        const vulnerabilityPath: string = resolve(dir, vulnerability);
-        readdirSync(vulnerabilityPath).forEach((item) => {
-            const filename = item.replace(/\.[^/.]+$/, "");
-            const filepath = resolve(vulnerabilityPath, item);
+        contracts = readdirSync(resolve(inputDir, vulnerability));
+        bar.start(contracts.length, 0);
 
-            if (!lstatSync(filepath).isDirectory()) {
-                const source: string = readFileSync(filepath, "utf8");
+        for (index = 0; index < contracts.length; index++) {
+            bar.update(index + 1);
+            try {
+                contract = contracts[index];
+                contractName = contract.replace(/\.[^/.]+$/, "");
+                contractPath = resolve(inputDir, vulnerability, contract);
+                contractSource = readFileSync(contractPath, "utf8");
+                contractVersion = detectVersion(contractSource);
 
-                try {
-                    const { avaiable, version } = detectVersion(source);
-                    if (!avaiable) throw new Error();
-
-                    const outPath: string = createOutputPath(
-                        [vulnerability],
-                        filename
-                    );
-                    const input: IInput = createInput(
-                        filename,
-                        source,
-                        version
-                    );
-                    const output: string | null = compile(
-                        filename,
-                        version,
-                        input
-                    );
-
-                    if (output !== null) outputFileSync(outPath, output);
-                } catch (err: any) {
-                    console.log(err.message);
-
-                    const errPath: string = createErrorPath(
-                        [vulnerability],
-                        filename
-                    );
-                    outputFileSync(errPath, source);
+                if (!contractVersion.available) {
+                    throw new Error(`Version ${contractVersion.version} is not avaiable`);
                 }
+
+                input = createInput(contractName, contractSource, contractVersion);
+                global.contractBytecode = compile(contractName, contractVersion, input);
+
+                outputPath = resolve(outputDir, vulnerability, contractName + ".txt");
+                outputFileSync(outputPath, global.contractBytecode);
+            } catch (err: any) {
+                errorPath = resolve(errorDir, vulnerability, contractName + ".txt");
+                outputFileSync(errorPath, `Error:\n${err.message}\nSolidity version: ${contractVersion.version}`);
             }
-        });
+        }
+
+        bar.stop();
     }
 }
 
 setup();
-main(inputPath);
+main();
