@@ -7,41 +7,64 @@ import {
     removeSync,
 } from "fs-extra";
 
-import { outputDir, convertDir } from "./constant.json";
-import { createConvertPath } from "./utils";
+import folderTree from "../folder-tree.json";
+import { outputDir, convertDir } from "../constant.json";
+import { Presets, SingleBar } from "cli-progress";
 
-const outputPath: string = resolve(outputDir);
-const convertPath: string = resolve(convertDir);
+const bar: SingleBar = new SingleBar({}, Presets.shades_classic);
 
 function setup(): void {
-    removeSync(convertPath);
-    ensureDirSync(convertPath);
+    removeSync(convertDir);
+    ensureDirSync(convertDir);
 }
 
-function main(dir: string): void {
-    const vulnerabilities: string[] = readdirSync(dir);
-    for (const vulnerability of vulnerabilities) {
-        if (vulnerability === "Other") continue;
+let vulnerability: string;
+let csvContent: string[];
+let contracts: string[],
+    contract: string,
+    contractName: string,
+    contractPath: string,
+    contractSource: string;
+let index: number;
+let convertPath: string;
 
-        console.log(`Start compile in ${vulnerability}`);
+function main(): void {
+    for (vulnerability of folderTree) {
+        console.log(`Start conver in ${vulnerability}`);
 
-        const vulnerabilityPath: string = resolve(dir, vulnerability);
-        const csvContent = ["ADDRESS,BYTECODE,LABEL"];
+        csvContent = ["ADDRESS,BYTECODE,LABEL"];
+        contracts = readdirSync(resolve(outputDir, vulnerability));
+        bar.start(contracts.length, 0);
 
-        readdirSync(vulnerabilityPath).forEach((item) => {
-            const filename = item.replace(/\.[^/.]+$/, "");
-            const filepath = resolve(vulnerabilityPath, item);
-            const source: string = readFileSync(filepath, "utf8");
+        for (index = 0; index < contracts.length; index++) {
+            bar.update(index + 1);
 
             try {
-                csvContent.push(`${filename},${source},1`);
-            } catch (err) {}
-        });
+                contract = contracts[index];
+                contractName = contract.replace(/\.[^/.]+$/, "");
+                contractPath = resolve(outputDir, vulnerability, contract);
+                contractSource = readFileSync(contractPath, "utf8");
 
-        const convertPath: string = createConvertPath([], vulnerability, "csv");
+                csvContent.push(`${contractName},${contractSource},1`);
+            } catch (err) {
+            } finally {
+                contract = null;
+                contractName = null;
+                contractPath = null;
+                contractSource = null;
+            }
+        }
+
+        bar.stop();
+
+        convertPath = resolve(
+            convertDir,
+            vulnerability,
+            vulnerability.split("/").pop() + "csv"
+        );
         outputFileSync(convertPath, csvContent.join("\n"));
     }
 }
 
 setup();
-main(outputPath);
+main();
