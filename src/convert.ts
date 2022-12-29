@@ -59,8 +59,7 @@ function main(): void {
 
         convertPath = resolve(
             convertDir,
-            vulnerability,
-            vulnerability.split("/").pop() + "csv"
+            vulnerability.split("/").pop() + ".csv"
         );
         outputFileSync(convertPath, csvContent.join("\n"));
     }
