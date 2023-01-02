@@ -5,13 +5,17 @@ import {
     readdirSync,
     readFileSync,
     removeSync,
+    createWriteStream,
+    WriteStream,
 } from "fs-extra";
+import { stringify, Stringifier } from "csv-stringify";
 
 import folderTree from "../folder-tree.json";
 import { outputDir, convertDir } from "../constant.json";
 import { Presets, SingleBar } from "cli-progress";
 
 const bar: SingleBar = new SingleBar({}, Presets.shades_classic);
+const columns = ["ADDRESS", "BYTECODE", "LABEL"];
 
 function setup(): void {
     removeSync(convertDir);
@@ -19,7 +23,6 @@ function setup(): void {
 }
 
 let vulnerability: string;
-let csvContent: string[];
 let contracts: string[],
     contract: string,
     contractName: string,
@@ -27,12 +30,16 @@ let contracts: string[],
     contractSource: string;
 let index: number;
 let convertPath: string;
+let writeableStream: WriteStream;
+let stringifier: Stringifier;
 
 function main(): void {
     for (vulnerability of folderTree) {
         console.log(`Start conver in ${vulnerability}`);
 
-        csvContent = ["ADDRESS,BYTECODE,LABEL"];
+        writeableStream = createWriteStream(resolve(convertDir, vulnerability + ".csv"));
+        stringifier = stringify({ header: true, columns: columns });
+
         contracts = readdirSync(resolve(outputDir, vulnerability));
         bar.start(contracts.length, 0);
 
@@ -45,7 +52,7 @@ function main(): void {
                 contractPath = resolve(outputDir, vulnerability, contract);
                 contractSource = readFileSync(contractPath, "utf8");
 
-                csvContent.push(`${contractName},${contractSource},1`);
+                stringifier.write([contractName, contractSource, "1"]);
             } catch (err) {
             } finally {
                 contract = null;
@@ -56,12 +63,7 @@ function main(): void {
         }
 
         bar.stop();
-
-        convertPath = resolve(
-            convertDir,
-            vulnerability.split("/").pop() + ".csv"
-        );
-        outputFileSync(convertPath, csvContent.join("\n"));
+        stringifier.pipe(writeableStream);
     }
 }
 
