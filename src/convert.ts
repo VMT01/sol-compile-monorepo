@@ -1,7 +1,6 @@
 import { resolve } from "path";
 import {
     ensureDirSync,
-    outputFileSync,
     readdirSync,
     readFileSync,
     removeSync,
@@ -22,22 +21,23 @@ function setup(): void {
     ensureDirSync(convertDir);
 }
 
-let vulnerability: string;
+let vulnerability: string,
+    vulnerabilityName: string;
 let contracts: string[],
     contract: string,
     contractName: string,
     contractPath: string,
     contractSource: string;
 let index: number;
-let convertPath: string;
 let writeableStream: WriteStream;
 let stringifier: Stringifier;
 
 function main(): void {
     for (vulnerability of folderTree) {
         console.log(`Start conver in ${vulnerability}`);
+        vulnerabilityName = vulnerability.split("/").pop();
 
-        writeableStream = createWriteStream(resolve(convertDir, vulnerability + ".csv"));
+        writeableStream = createWriteStream(resolve(convertDir, vulnerabilityName + ".csv"));
         stringifier = stringify({ header: true, columns: columns });
 
         contracts = readdirSync(resolve(outputDir, vulnerability));
