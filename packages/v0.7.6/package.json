@@ -1,8 +1,0 @@
-{
-  "name": "@solc-compiler/v0.7.6",
-  "version": "1.0.0",
-  "license": "MIT",
-  "dependencies": {
-    "solc": "0.7.6"
-  }
-}
